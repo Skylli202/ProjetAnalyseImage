@@ -8,8 +8,11 @@ Created on Thu Oct 24 14:43:57 2019
 # =============================================================================
 # Import
 # =============================================================================
+import matplotlib.pyplot as plt
 import numpy as np
 import function as f
+
+from PIL import Image
 
 # =============================================================================
 # Test Addition
@@ -102,3 +105,160 @@ def testDilatation3x3(img):
 
 def displayTestWikiDila3x3():
     print(testDilatation3x3(genWikiDilatation()), "\n")
+ 
+
+def testEroDilaOpenCloseWithRealImage(fname):
+    image = Image.open(fname).convert("L")
+    print("Image de départ :")
+    plt.imshow(image, cmap='gray', vmin=0, vmax=255)
+    plt.show()
+    
+    # Conversion en numpy.array
+    arr = np.asarray(image)
+    carr = np.copy(arr)
+    
+    # Conversion en image binaire
+    carr = f.threshold_low(carr, 128)
+    print("Image binarisée :")
+    plt.imshow(carr, cmap='gray', vmin=0, vmax=1)
+    plt.show()
+    
+    # Erosion de l'image
+    imgErosion = f.erosion3x3(carr)
+    print("Image érodée :")
+    plt.imshow(imgErosion, cmap='gray', vmin=0, vmax=1)
+    plt.show()
+    
+    # Dilatation de l'image
+    imgDilatation = f.dilatation3x3(carr)
+    print("Image dilatée :")
+    plt.imshow(imgDilatation, cmap='gray', vmin=0, vmax=1)
+    plt.show()
+    
+    # Ouverture de l'image
+    imgOuverture = f.ouverture(carr)
+    print("Image Ouverte : ")
+    plt.imshow(imgOuverture, cmap='gray', vmin=0, vmax=1)
+    plt.show()
+    
+    # Fermeture d'une image
+    imgFermeture = f.fermeture(carr)
+    print("Image fermée : ")
+    plt.imshow(imgFermeture, cmap='gray', vmin=0, vmax=1)
+    plt.show()
+    
+def testOpenCloseWithBinaryArray():
+    # Création de l'image
+    img1 = f.genPerfectSquareWithArgs((16,16), 3, 10, 5, 5)
+    
+    # Créons un troue que la fermeture devrait fermer et l'ouverture agrandir
+    img1[4][11] = 0
+    
+    # Créons une excroissance que la fermeture devrai adoussir 
+    img1[8][13] = 1
+    
+    #print (img1)
+    
+    print("Image de départ : ")
+    plt.imshow(img1, cmap='gray', vmin=0, vmax=1)
+    plt.show()
+    
+    # Fermeture
+    img1Close = f.fermeture(img1)
+    print("Fermeture : ")
+    plt.imshow(img1Close, cmap='gray', vmin=0, vmax=1)
+    plt.show()
+    
+    # Ouverture
+    img1Open = f.ouverture(img1)
+    print("Ouverture : ")
+    plt.imshow(img1Open, cmap='gray', vmin=0, vmax=1)
+    plt.show()
+    
+def testDilatationErosion():
+    square = np.zeros((16,16))
+    square[2:7,2:7] = 1
+    square[3,3] = 0
+    print("Image de départ : ")
+    plt.imshow(square, cmap='gray', vmin=0, vmax=1)
+    plt.show()
+    
+    squareDilatation = f.dilatation3x3(square)
+    print("Dilatation de l'image : ")
+    plt.imshow(squareDilatation, cmap='gray', vmin=0, vmax=1)
+    plt.show()
+    
+    squareErosion = f.erosion3x3(squareDilatation)
+    print("Erosion du dilatée de l'image : ")
+    plt.imshow(squareErosion, cmap='gray', vmin=0, vmax=1)
+    plt.show()
+    
+    print("Fermeture fonctionnel")
+    
+def testErosionDilatation():
+    square = np.zeros((16,16))
+    square[2:7,2:7] = 1
+    square[3,3] = 0
+    print("Image de départ : ")
+    plt.imshow(square, cmap='gray', vmin=0, vmax=1)
+    plt.show()
+    
+    squareErosion = f.erosion3x3(square)
+    print("Erosion de l'image : ")
+    plt.imshow(squareErosion, cmap='gray', vmin=0, vmax=1)
+    plt.show()
+    
+    squareDilatation = f.dilatation3x3(squareErosion)
+    print("Dilatation de l'érodée de l'image : ")
+    #plt.imshow(squareDilatation, cmap='gray', vmin=0, vmax=1)
+    plt.show()
+    
+    print("Ouverture fonctionnel")
+    
+# =============================================================================
+#  Dilatation   
+# =============================================================================
+def testCheckFiltre():           
+    print (f.checkFiltre(np.ones((1,1))))
+    print (f.checkFiltre(np.ones((3,3))))
+    print (f.checkFiltre(np.ones((11,11))))
+    
+    print (f.checkFiltre(np.ones((1,2))))
+    print (f.checkFiltre(np.ones((4,4))))
+    filtre = np.ones((3,3))
+    filtre[1,1] = 0
+    print (f.checkFiltre(filtre))
+    
+    print ("Expected : true true true false false false")
+    
+def testDilatation():
+    file3 = './ressource/logo_couleur.jpg'
+    fname = file3
+    image = Image.open(fname).convert("L")
+    print("Image de départ :")
+    plt.imshow(image, cmap='gray', vmin=0, vmax=255)
+    plt.show()
+    
+    img = np.array(image)
+    threshold = 124
+    imgBin = f.threshold_high(img, threshold)
+    print("Image binariser avec un seuil de ",threshold)
+    plt.imshow(imgBin, cmap='gray', vmin=0, vmax=1)
+    plt.show()
+    
+    elemStruct = np.ones((3,3))
+    
+    imgDilate = f.dilatation(imgBin, elemStruct)
+    print("dilatation : ")
+    plt.imshow(imgDilate, cmap='gray', vmin=0, vmax=1)
+    plt.show()
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
