@@ -49,21 +49,28 @@ file5 = './ressource/sw9.png'
 #plt.imshow(imgDilatation, cmap='gray', vmin=0, vmax=1)
 #plt.show()
 
-img = np.zeros((64,64))
-img[16:48,16:48] = 1
-plt.imshow(img, cmap='gray', vmin=0, vmax=1)
+imgBin = np.zeros((16,16))
+imgBin[4:13,4:13] = 1
+plt.imshow(imgBin, cmap='gray', vmin=0, vmax=1)
 plt.show()
 
-imgAmin = f.amincissement(img)
-plt.imshow(imgAmin, cmap='gray', vmin=0, vmax=1)
+fname = file3
+image = Image.open(fname).convert("L")
+print("Image de départ :")
+plt.imshow(image, cmap='gray', vmin=0, vmax=255)
 plt.show()
 
-imgAmin2 = f.amincissement(imgAmin)
-plt.imshow(imgAmin2, cmap='gray', vmin=0, vmax=1)
+img = np.array(image)
+threshold = 200
+imgBin = f.threshold_high(img, threshold)
+imgBin = f.invert(imgBin)
+print("Image binariser avec un seuil de ", threshold)
+plt.imshow(imgBin, cmap='gray', vmin=0, vmax=1)
 plt.show()
 
-imgAmin3 = f.amincissement(imgAmin2)
-plt.imshow(imgAmin3, cmap='gray', vmin=0, vmax=1)
+print("img sq lantuejoul")
+imgSq = f.erosion(imgBin,np.ones((3,3)))
+plt.imshow(imgSq, cmap='gray', vmin=0, vmax=1)
 plt.show()
 
 

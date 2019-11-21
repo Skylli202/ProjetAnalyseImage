@@ -1,4 +1,5 @@
 import numpy as np
+import matplotlib.pyplot as plt
 
 def rgb2gray(rgb):
     return np.dot(rgb[...,:3], [0.2989, 0.5870, 0.1140])
@@ -32,6 +33,16 @@ def threshold_low(img, thresh):
 def threshold_auto(img):
     print("later")
 
+def invert(img):
+    res = np.zeros((img.shape))
+    for i in range(img.shape[0]):
+        for j in range(img.shape[1]):
+            if(img[i,j] == 0):
+                res[i,j] = 1
+            else:
+                res[i,j] = 0
+    return res
+
 # Addition
 def addition(im1, im2):
 #    if(im1.shape != im2.shape):
@@ -54,9 +65,11 @@ def addition(im1, im2):
 
 # Soustraction
 def soustraction(im1, im2):
-    if(im1.shape != im2.shape):
-        print("error both image do not have the same shape")
-    else:
+#    if(im1.shape != im2.shape):
+#        print("error both image do not have the same shape")
+#    else:
+    
+     if(im1.shape == im2.shape):
         #shape are equals
         res = np.zeros(im1.shape)
         for i in range(im1.shape[0]):
@@ -217,14 +230,12 @@ def amincissement(img):
     
     LFamily = np.array([L1, L2, L3, L4, L5, L6, L7, L8])
     
-    print(LFamily.shape[0])
-    
     backup = np.copy(img)
     res = np.copy(img)
     
     for x in range(LFamily.shape[0]):
-        for i in range(img.shape[0]):
-            for j in range(img.shape[1]):
+        for i in range(1, img.shape[0]-1):
+            for j in range(1, img.shape[1]-1):
                 slice = backup[i-1:i+2,j-1:j+2]
             
                 cpt = 0
@@ -237,7 +248,7 @@ def amincissement(img):
                 if(cpt == 7):
 #                    print("(",i,";",j,")")
                     res[i,j] = 0
-        backup = res           
+        backup = np.copy(res)
                 
                                
     return res
@@ -257,35 +268,85 @@ def epaississement(img):
     L8 = np.array([[1,1,2],[1,0,0],[2,0,0]]) 
     
     LFamily = np.array([L1, L2, L3, L4, L5, L6, L7, L8])
-    
-    print(LFamily.shape[0])
-    
+        
     backup = np.copy(img)
     res = np.copy(img)
     
-    for i in range(img.shape[0]):
-        for j in range(img.shape[1]):
-            slice = backup[i-1:i+2,j-1:j+2]
+    for x in range(LFamily.shape[0]):
+        for i in range(1, img.shape[0]-1):
+            for j in range(1, img.shape[1]-1):
+                slice = backup[i-1:i+2,j-1:j+2]
             
-            for x in range(LFamily.shape[0]):
-    #                print("x =",x)
                 cpt = 0
                 for a in range(slice.shape[0]):
                     for b in range(slice.shape[1]):
-                        array = LFamily[x]
-                        if(array[a,b] != 2):
-                            if(array[a,b] == slice[a,b]):
+                        L = LFamily[x]
+                        if(L[a,b] != 2):
+                            if(L[a,b] == slice[a,b]):
                                 cpt = 1 + cpt
-                if(cpt == 6):
+                if(cpt == 7):
                     res[i,j] = 1
-                           
+        backup = np.copy(res)
+                
+                               
     return res
 
 # =============================================================================
 # Squelette
 # =============================================================================
+def squeletteWithLantuejoul(img, rang):
+    backup = np.copy(img)
+    res = np.zeros((img.shape))
+    
+    B = np.ones((3,3))
+    
+    for i in range(0,rang):
+        lambdaB = np.ones(((i*2)+1,(i*2)+1))
+#        lambdaB = np.ones((3,3))
+#        print("Lambda B :\n",lambdaB)
+        
+        imgEroLambdaB = erosion(backup, lambdaB)
+#        print("Erosion :\n",imgEroLambdaB)
+        
+        imgOpen = ouverture(imgEroLambdaB, B)
+#        print("Open :\n",imgOpen)
+        
+        res += soustraction(imgEroLambdaB, imgOpen) 
+        
+    return res
+    
+
 def squeletteWithThinHomothopique(img):
-    return 0
+    backup = np.copy(img)
+    res = np.copy(amincissement(img))
+    while(not(np.array_equal(backup,res))):
+        backup = np.copy(res)
+        res = np.copy(amincissement(res))
+#        plt.imshow(res, cmap='gray', vmin=0, vmax=1)
+#        plt.show()
+    return res
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
