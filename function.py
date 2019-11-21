@@ -95,30 +95,24 @@ def erosion(img, elemStruct):
       print ("L'élément structurant n'est pas correct")
       return False
   
+    if(elemStruct.shape[0]*elemStruct.shape[1] != np.count_nonzero(elemStruct)):
+        print("Warrning : elemStruct isn't fithfull with ones, function.erosion might not work properly")
+        
     backup = np.copy(img)
-    res = np.zeros((img.shape))
+    res = np.copy((img))
     
     rayon_elemStruct = int((elemStruct.shape[0]-1)/2)
     
     for i in range(img.shape[0]):
         for j in range(img.shape[1]):
-            # do something here
-            lower_value = i-rayon_elemStruct
-            upper_value = i+rayon_elemStruct+1
+                        
+            slice = backup[i-rayon_elemStruct:i+rayon_elemStruct+1, j-rayon_elemStruct:j+rayon_elemStruct+1]
             
-            if(lower_value < 0):
-                lower_value = 0
-            if(upper_value < 0):
-                upper_value = 0
-            
-            slice = backup[lower_value:upper_value, j-rayon_elemStruct:j+rayon_elemStruct+1]
-            
-            if(np.count_nonzero(slice) != 0):
-                #print("(",i,";",j,")")
-                if(np.count_nonzero(elemStruct) != np.count_nonzero(slice)):
-                    res[i,j] = 0
-                else:
-                    res[i,j] = 1
+            if((np.count_nonzero(elemStruct) - np.count_nonzero(slice)) == 0):
+                continue
+            else:
+                res[i,j] = 0
+             # Ne vérifie pas que les 1 soient au même endroit dans slice qu'ils ne le soient dans l'element structurant
     return res
 
 # Dilatation
@@ -152,30 +146,22 @@ def dilatation(img, elemStruct):
       return False
   
     backup = np.copy(img)
-    res = np.zeros((img.shape))
+    res = np.copy(img)
     
     rayon_elemStruct = int((elemStruct.shape[0]-1)/2)
     
     for i in range(img.shape[0]):
         for j in range(img.shape[1]):
-            # do something here
-            lower_value = i-rayon_elemStruct
-            upper_value = i+rayon_elemStruct+1
             
-            if(lower_value < 0):
-                lower_value = 0
-            if(upper_value < 0):
-                upper_value = 0
+#            slice = backup[i-rayon_elemStruct:i+rayon_elemStruct+1, j-rayon_elemStruct:j+rayon_elemStruct+1]
+#            if(np.count_nonzero(slice) != 0):
+#                #print("(",i,";",j,")")
+#                if(np.count_nonzero(addition(slice,elemStruct)) != 0):
+#                    res[i,j] = 1
             
-            slice = backup[lower_value:upper_value, j-rayon_elemStruct:j+rayon_elemStruct+1]
-            #print("(",i, ";", j,")\n", slice)
-            
-            # Vérifions a présent si les 1 de l'élément structurant touchent des 1 de l'image
-            #.. Si le slice n'a pas de 0 inutile de vérifier
-            if(np.count_nonzero(slice) != 0):
-                #print("(",i,";",j,")")
-                if(np.count_nonzero(addition(slice,elemStruct)) != 0):
-                    res[i,j] = 1
+            if(backup[i,j] == 1):
+                slice = backup[i-rayon_elemStruct:i+rayon_elemStruct+1, j-rayon_elemStruct:j+rayon_elemStruct+1]
+                res[i-rayon_elemStruct:i+rayon_elemStruct+1, j-rayon_elemStruct:j+rayon_elemStruct+1] = 1
             
     return res
 
@@ -196,68 +182,110 @@ def checkFiltre(filtre):
     
 
 # Ouverture = erosion + dilatation
-def ouverture(img):
-    backup = np.copy(img)
+def ouverture3x3(img):
     res = erosion3x3(img)
     res = dilatation3x3(res)
-    return res;
+    return res
+
+def ouverture(img, elemStruct):
+    res = erosion(img, elemStruct)
+    res = dilatation(res, elemStruct)
+    return res
     
 # Fermeture = dilatation + erosion
-def fermeture(img):
-    backup = np.copy(img)
+def fermeture3x3(img):
     res = dilatation3x3(img)
     res = erosion3x3(res)
-    return res;
+    return res
+
+def fermeture(img, elemStruct):
+    res = dilatation(img, elemStruct)
+    res = erosion(res, elemStruct)
+    return res
+# =============================================================================
+# # Amincissement
+# ============================================================================
+def amincissement(img):
+    L1 = np.array([[1,1,1],[2,1,2],[0,0,0]])
+    L2 = np.array([[2,1,1],[0,1,1],[0,0,2]])
+    L3 = np.array([[0,2,1],[0,1,1],[0,2,1]])
+    L4 = np.array([[0,0,2],[0,1,1],[2,1,1]]) 
+    L5 = np.array([[0,0,0],[2,1,2],[1,1,1]]) 
+    L6 = np.array([[2,0,0],[1,1,0],[1,1,2]]) 
+    L7 = np.array([[1,2,0],[1,1,0],[1,2,0]]) 
+    L8 = np.array([[1,1,2],[1,1,0],[2,0,0]]) 
     
-# Amincissement
+    LFamily = np.array([L1, L2, L3, L4, L5, L6, L7, L8])
+    
+    print(LFamily.shape[0])
+    
+    backup = np.copy(img)
+    res = np.copy(img)
+    
+    for x in range(LFamily.shape[0]):
+        for i in range(img.shape[0]):
+            for j in range(img.shape[1]):
+                slice = backup[i-1:i+2,j-1:j+2]
+            
+                cpt = 0
+                for a in range(slice.shape[0]):
+                    for b in range(slice.shape[1]):
+                        L = LFamily[x]
+                        if(L[a,b] != 2):
+                            if(L[a,b] == slice[a,b]):
+                                cpt = 1 + cpt
+                if(cpt == 7):
+#                    print("(",i,";",j,")")
+                    res[i,j] = 0
+        backup = res           
+                
+                               
+    return res
+            
+            
+# =============================================================================
 # Epaississement
+# =============================================================================
+def epaississement(img):
+    L1 = np.array([[1,1,1],[2,0,2],[0,0,0]])
+    L2 = np.array([[2,1,1],[0,0,1],[0,0,2]])
+    L3 = np.array([[0,2,1],[0,0,1],[0,2,1]])
+    L4 = np.array([[0,0,2],[0,0,1],[2,1,1]]) 
+    L5 = np.array([[0,0,0],[2,0,2],[1,1,1]]) 
+    L6 = np.array([[2,0,0],[1,0,0],[1,1,2]]) 
+    L7 = np.array([[1,2,0],[1,0,0],[1,2,0]]) 
+    L8 = np.array([[1,1,2],[1,0,0],[2,0,0]]) 
     
-
-# Gen d'image binaire test
-def genPerfectSquare():
-    #shape is 16x16
-    res = np.zeros((16,16))
+    LFamily = np.array([L1, L2, L3, L4, L5, L6, L7, L8])
     
-    # Carré blanc
-    res[6][4] = 1
-    res[7][4] = 1
-    res[8][4] = 1
-    res[9][4] = 1
+    print(LFamily.shape[0])
     
-    res[6][5] = 1
-    res[7][5] = 1
-    res[8][5] = 1
-    res[9][5] = 1
+    backup = np.copy(img)
+    res = np.copy(img)
     
-    res[6][6] = 1
-    res[7][6] = 1
-    res[8][6] = 1
-    res[9][6] = 1
-    
-    res[6][7] = 1
-    res[7][7] = 1
-    res[8][7] = 1
-    res[9][7] = 1
+    for i in range(img.shape[0]):
+        for j in range(img.shape[1]):
+            slice = backup[i-1:i+2,j-1:j+2]
+            
+            for x in range(LFamily.shape[0]):
+    #                print("x =",x)
+                cpt = 0
+                for a in range(slice.shape[0]):
+                    for b in range(slice.shape[1]):
+                        array = LFamily[x]
+                        if(array[a,b] != 2):
+                            if(array[a,b] == slice[a,b]):
+                                cpt = 1 + cpt
+                if(cpt == 6):
+                    res[i,j] = 1
+                           
     return res
 
-def genPerfectSquareWithArgs(shape, startX, startY, width, height):
-    res = np.zeros(shape)
-    for i in range(width):
-        for j in range(height):
-            res[startX + i][startY + j] = 1
-    
-    return res
-
-def genSqareWithHole():
-    res = genPerfectSquare()
-    
-    res[7][5] = 0
-    res[7][6] = 0
-    
-    return res
-
-
-
+# =============================================================================
+# Squelette
+# =============================================================================
+def squeletteWithThinHomothopique(img):
+    return 0
 
 
 

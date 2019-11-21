@@ -216,6 +216,32 @@ def testErosionDilatation():
     print("Ouverture fonctionnel")
     
 # =============================================================================
+#  Erosion
+# =============================================================================
+def testErosion():
+    file3 = './ressource/logo_couleur.jpg'
+    fname = file3
+    image = Image.open(fname).convert("L")
+    print("Image de départ :")
+    plt.imshow(image, cmap='gray', vmin=0, vmax=255)
+    plt.show()
+    
+    img = np.array(image)
+    threshold = 124
+    imgBin = f.threshold_high(img, threshold)
+    print("Image binariser avec un seuil de ",threshold)
+    plt.imshow(imgBin, cmap='gray', vmin=0, vmax=1)
+    plt.show()
+    
+    elemStruct = np.ones((3,3))
+    
+    imgDilate = f.erosion(imgBin, elemStruct)
+    print("erosion : ")
+    plt.imshow(imgDilate, cmap='gray', vmin=0, vmax=1)
+    plt.show()
+    
+    
+# =============================================================================
 #  Dilatation   
 # =============================================================================
 def testCheckFiltre():           
@@ -254,9 +280,46 @@ def testDilatation():
     plt.show()
 
     
+# =============================================================================
+#  FINAL TEST OPEN & CLOSE   
+# =============================================================================
     
+def testFinalPart1():
+    file2 = './ressource/bin2.png'
+    fname = file2
+    image = Image.open(fname).convert("L")
+    print("Image de départ :")
+    plt.imshow(image, cmap='gray', vmin=0, vmax=255)
+    plt.show()
     
+    img = np.array(image)
+    threshold = 124
+    imgBin = f.threshold_high(img, threshold)
+    print("Image binariser avec un seuil de ",threshold)
+    plt.imshow(imgBin, cmap='gray', vmin=0, vmax=1)
+    plt.show()
     
+    elemStruct = np.ones((7,7))
+    
+    imgDilate = f.dilatation(imgBin, elemStruct)
+    print("dilatation : ")
+    plt.imshow(imgDilate, cmap='gray', vmin=0, vmax=1)
+    plt.show()
+    
+    imgErosion = f.erosion(imgBin, elemStruct)
+    print("erosion : ")
+    plt.imshow(imgErosion, cmap='gray', vmin=0, vmax=1)
+    plt.show()
+    
+    imgOpen = f.ouverture(imgBin, elemStruct)
+    print("Open : ")
+    plt.imshow(imgOpen, cmap='gray', vmin=0, vmax=1)
+    plt.show()
+    
+    imgClose = f.fermeture(imgBin, elemStruct)
+    print("Close : ")
+    plt.imshow(imgClose, cmap='gray', vmin=0, vmax=1)
+    plt.show()
     
     
     
