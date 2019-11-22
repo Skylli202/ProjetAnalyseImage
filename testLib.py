@@ -285,7 +285,7 @@ def testDilatation():
 # =============================================================================
     
 def testFinalPart1():
-    file2 = './ressource/bin2.png'
+    file2 = './ressource/logo_couleur.png'
     fname = file2
     image = Image.open(fname).convert("L")
     print("Image de départ :")
@@ -311,15 +311,15 @@ def testFinalPart1():
     plt.imshow(imgErosion, cmap='gray', vmin=0, vmax=1)
     plt.show()
     
-    imgOpen = f.ouverture(imgBin, elemStruct)
-    print("Open : ")
-    plt.imshow(imgOpen, cmap='gray', vmin=0, vmax=1)
-    plt.show()
-    
-    imgClose = f.fermeture(imgBin, elemStruct)
-    print("Close : ")
-    plt.imshow(imgClose, cmap='gray', vmin=0, vmax=1)
-    plt.show()
+#    imgOpen = f.ouverture(imgBin, elemStruct)
+#    print("Open : ")
+#    plt.imshow(imgOpen, cmap='gray', vmin=0, vmax=1)
+#    plt.show()
+#    
+#    imgClose = f.fermeture(imgBin, elemStruct)
+#    print("Close : ")
+#    plt.imshow(imgClose, cmap='gray', vmin=0, vmax=1)
+#    plt.show()
     
     
     

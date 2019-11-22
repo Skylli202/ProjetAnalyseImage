@@ -40,31 +40,35 @@ file5 = './ressource/sw9.png'
 
 #img = np.zeros((8,8))
 #img[2:6,2:6] = 1
+#plt.figure()
 #plt.imshow(img, cmap='gray', vmin=0, vmax=1)
 #plt.show()
-#
-#elemStruct = np.ones((3,3))
-#
+
+elemStruct = np.ones((3,3))
+
 #imgDilatation = f.dilatation(img, elemStruct)
+#plt.figure()
 #plt.imshow(imgDilatation, cmap='gray', vmin=0, vmax=1)
 #plt.show()
 
-img = np.zeros((64,64))
-img[16:48,16:48] = 1
+img = np.zeros((16,16))
+img[4:12,4:12] = 1
+plt.figure()
 plt.imshow(img, cmap='gray', vmin=0, vmax=1)
 plt.show()
 
 imgAmin = f.amincissement(img)
+plt.figure()
 plt.imshow(imgAmin, cmap='gray', vmin=0, vmax=1)
 plt.show()
-
-imgAmin2 = f.amincissement(imgAmin)
-plt.imshow(imgAmin2, cmap='gray', vmin=0, vmax=1)
-plt.show()
-
-imgAmin3 = f.amincissement(imgAmin2)
-plt.imshow(imgAmin3, cmap='gray', vmin=0, vmax=1)
-plt.show()
+#
+#imgAmin2 = f.amincissement(imgAmin)
+#plt.imshow(imgAmin2, cmap='gray', vmin=0, vmax=1)
+#plt.show()
+#
+#imgAmin3 = f.amincissement(imgAmin2)
+#plt.imshow(imgAmin3, cmap='gray', vmin=0, vmax=1)
+#plt.show()
 
 
 

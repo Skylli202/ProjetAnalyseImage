@@ -217,27 +217,28 @@ def amincissement(img):
     
     LFamily = np.array([L1, L2, L3, L4, L5, L6, L7, L8])
     
-    print(LFamily.shape[0])
-    
     backup = np.copy(img)
     res = np.copy(img)
     
-    for x in range(LFamily.shape[0]):
-        for i in range(img.shape[0]):
-            for j in range(img.shape[1]):
+    for x in range(LFamily.shape[0]-1):
+        L = LFamily[x]
+        print(L)
+        for i in range(1,img.shape[0]-1):
+            for j in range(1,img.shape[1]-1):
                 slice = backup[i-1:i+2,j-1:j+2]
             
                 cpt = 0
                 for a in range(slice.shape[0]):
                     for b in range(slice.shape[1]):
-                        L = LFamily[x]
+                        
                         if(L[a,b] != 2):
                             if(L[a,b] == slice[a,b]):
                                 cpt = 1 + cpt
                 if(cpt == 7):
-#                    print("(",i,";",j,")")
+                    #print("(",i,";",j,")")
                     res[i,j] = 0
-        backup = res           
+        backup = np.copy(res)
+        print(res)           
                 
                                
     return res
@@ -276,7 +277,7 @@ def epaississement(img):
                         if(array[a,b] != 2):
                             if(array[a,b] == slice[a,b]):
                                 cpt = 1 + cpt
-                if(cpt == 6):
+                if(cpt == 7):
                     res[i,j] = 1
                            
     return res
